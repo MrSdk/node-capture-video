@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- BOOTSTRAP CORE STYLE  -->
+    <link href="/public/css/bootstrap.css" rel="stylesheet" />
+    <!-- FONT AWESOME ICONS  -->
+    <link href="/public/css/font-awesome.css" rel="stylesheet" />
+    <!-- CUSTOM STYLE  -->
+    <link href="/public/css/style.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/public/forStepper/scss/main.css">
+
+</head>
+
+<body> 
+    <p style="visibility: hidden" id="hiddenStatus"></p>
+
+    <script>
+
+        let status;
+        function onVidyoClientLoaded(stattus) {
+            status = stattus;
+        }
+
+        function onClick() {
+        //     document.getElementById('col_1').style.visibility = 'hidden';
+        // document.getElementById('col_2').style.visibility = 'visible'
+            if (document.getElementById('name').value) {
+                let userName = document.getElementById('name').value;
+                let token = "<%= (token) %>";
+                {
+                    // console.log(document.getElementById('hiddenStatus').value);
+
+                    switch (status.state) {
+                        case "READY":
+
+                            // Create Vidyoconnector
+                            {
+                                VC.CreateVidyoConnector({
+                                    viewId: "renderer",
+                                    viewStyle: "VIDYO_CONNECTORVIEWSTYLE_Default",
+                                    remoteParticipants: 8,
+                                    logFileFilter: "warning info@VidyoClient info@VidyoConnector",
+                                    logFileName: "",
+                                    userData: ""
+                                }).then(function (vidyoConnector) {
+                                    /*Handle appearance and disappearance of camera devices in the system*/
+                                    vidyoConnector.RegisterLocalCameraEventListener({
+                                        onAdded: function (localCamera) { },
+                                        onRemoved: function (localCamera) { },
+                                        onSelected: function (localCamera) { },
+                                        onStateUpdated: function (localCamera, state) { }
+                                    }).then(function () {
+                                        console.log("RegisterLocalCameraEventListener Success");
+                                    }).catch(function () {
+                                        console.error("RegisterLocalCameraEventListener Failed");
+                                    });
+
+                                    /*Handle appearance and disappearance of microphone devices in the system*/
+                                    vidyoConnector.RegisterLocalMicrophoneEventListener({
+                                        onAdded: function (localMicrophone) { },
+                                        onRemoved: function (localMicrophone) { },
+                                        onSelected: function (localMicrophone) { },
+                                        onStateUpdated: function (localMicrophone, state) { }
+                                    }).then(function () {
+                                        console.log("RegisterLocalMicrophoneEventListener Success");
+                                    }).catch(function () {
+                                        console.error("RegisterLocalMicrophoneEventListener Failed");
+                                    });
+
+                                    /*Handle appearance and disappearance of speaker devices in the system*/
+                                    vidyoConnector.RegisterLocalSpeakerEventListener({
+                                        onAdded: function (localSpeaker) { },
+                                        onRemoved: function (localSpeaker) { },
+                                        onSelected: function (localSpeaker) { },
+                                        onStateUpdated: function (localSpeaker, state) { }
+                                    }).then(function () {
+                                        console.log("RegisterLocalSpeakerEventListener Success");
+                                    }).catch(function () {
+                                        console.error("RegisterLocalSpeakerEventListener Failed");
+                                    });
+                                    // Add Token and Connect To Conference
+                                    vidyoConnector.Connect({
+                                        host: "prod.vidyo.io",
+                                        token: token, //Generated Token
+                                        displayName: userName, //User Name
+                                        resourceId: "demoroom", //Conference Name
+                                        onSuccess: function () {
+                                            console.log("Sucessfully connected");
+                                        },
+                                        onFailure: function (reason) {
+                                            console.log("Error while connecting ", reason);
+                                        },
+                                        onDisconnected: function (reason) {
+                                            console.log("Disconnected ", reason);
+                                        }
+                                    }).then(function (status) {
+
+                                    }).catch(function () {
+
+                                    });
+                                });
+                            }
+                            break;
+                        case "RETRYING":
+                            break;
+                        case "FAILED":
+                            break;
+                        case "FAILEDVERSION":
+                            break;
+                        case "NOTAVAILABLE":
+                            break;
+                    }
+                    return true;
+
+                }
+
+            } else {
+                console.log("Input Invalid !");
+
+            }
+
+        }
+
+    </script>
+  
+  <div class="container">
+        <!-- <div class="row">
+            <div class="col-md-12">
+                <h3 class="page-head-line">Testing conference by Mr_Sdk</h3>
+            </div>
+        </div> -->
+        
+<div class="row">
+
+
+    <div style="width: 80%; margin-top: -140px" class="uic-wrapper no-touch">
+        <ul>
+            <li>
+                <ul class="cards-wrapper">
+                    <li style="padding: 0;margin-top: 100px" class="panel panel-default card card-front active">
+                        <!-- <div class="panel panel-primary"> -->
+                            <div class="panel-heading">
+                                <h4><b>Enter your user name</b></h4>
+                            </div>
+                            <div class="panel-body" style="font-size: 17px">
+                                <form>
+                                    <div class="form-group">
+                                        <label for="name">Name </label>
+                                        <input type="text" class="form-control" id="name" placeholder="..." />
+                                    </div>
+
+
+                                </form>
+                            </div>
+
+
+                    </li>
+                    <li style="padding: 0;height: 600px" class="panel panel-default card card-middle">
+                               
+                            <div class="panel-heading">
+                                <h6 style="margin-left: 3%;font-size: 20px"><b>Conference</b></h6>
+                            </div>
+                            <div class="panel-body">
+                                <div id="renderer" style="height: 500px;width: 100%; ">
+                                 </div>
+                            </div>
+                     
+                    </li>
+                </ul>
+
+                <nav>
+                    <ul>
+                        <li><a style="cursor: pointer;margin-top: -5px;margin-left: -10px" class="btn-back" ><i class="fa fa-arrow-left"></i></a></li>
+                        <li><a onclick="onClick()" style="cursor: pointer" class="btn-next">Join <i class="fa fa-arrow-right"></i></a></li>
+ 
+                    </ul>
+                </nav>
+
+            </li>
+        </ul>
+    </div> 
+
+
+
+</div>
+ 
+    </div>
+  <script src="https://unpkg.com/materialize-stepper@3.0.1/dist/js/mstepper.min.js"></script>
+    <script
+        src="https://static.vidyo.io/latest/javascript/VidyoClient/VidyoClient.js?onload=onVidyoClientLoaded&webrtc=true&plugin=false"></script>
+
+
+    <script src="/public/js/jquery-1.11.1.js"></script>
+    <!-- BOOTSTRAP SCRIPTS  -->
+    <script src="/public/js/bootstrap.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="/public/forStepper/js/plugins.js"></script>
+    <script src="/public/forStepper/js/main.js"></script>
+<script>
+
+// document.getElementById('col_2').style.visibility = 'hidden';
+// document.getElementById('col_1').style['margin-left'] = '100px';
+</script>
+</body>
+
+</html>
